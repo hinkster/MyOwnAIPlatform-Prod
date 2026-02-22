@@ -1,0 +1,87 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String    @id @default(cuid())
+  email        String    @unique
+  passwordHash String    @map("password_hash")
+  name         String?
+  emailVerified DateTime? @map("email_verified")
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+  memberships  Membership[]
+}
+
+model Organization {
+  id        String   @id @default(cuid())
+  name      String
+  slug      String   @unique
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  memberships   Membership[]
+  tenantConfig  TenantConfig?
+  providerKeys  ProviderKey[]
+  auditLogs     AuditLog[]
+}
+
+model Membership {
+  userId         String   @map("user_id")
+  organizationId String   @map("organization_id")
+  role           Role     @default(MEMBER)
+  createdAt      DateTime @default(now()) @map("created_at")
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  @@id([userId, organizationId])
+}
+
+enum Role {
+  OWNER
+  ADMIN
+  MEMBER
+}
+
+model TenantConfig {
+  id                  String   @id @default(cuid())
+  organizationId      String   @unique @map("organization_id")
+  useCase             String?  @map("use_case")
+  tone                String?
+  providerOrder       Json?    @map("provider_order")
+  allowOllamaFallback Boolean  @default(false) @map("allow_ollama_fallback")
+  branding            Json?
+  createdAt           DateTime @default(now()) @map("created_at")
+  updatedAt           DateTime @updatedAt @map("updated_at")
+  organization        Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+}
+
+model ProviderKey {
+  id             String   @id @default(cuid())
+  organizationId String   @map("organization_id")
+  provider       Provider
+  encryptedKey   String   @map("encrypted_key")
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  @@unique([organizationId, provider])
+}
+
+enum Provider {
+  OPENAI
+  ANTHROPIC
+  GEMINI
+}
+
+model AuditLog {
+  id             String   @id @default(cuid())
+  action         String
+  actorUserId    String?  @map("actor_user_id")
+  organizationId String   @map("organization_id")
+  createdAt      DateTime @default(now()) @map("created_at")
+  metadata       Json?
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+}

@@ -1,0 +1,33 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Env and secrets
+.env
+.env.local
+.env.*.local
+
+# Build and cache
+.next/
+out/
+dist/
+*.tsbuildinfo
+
+# Prisma
+apps/web/prisma/*.db
+apps/web/prisma/*.db-journal
+
+# IDE and OS
+.idea/
+.vscode/
+*.log
+.DS_Store
+Thumbs.db
+
+# Test
+coverage/
+.nyc_output/
+
+# Debug
+npm-debug.log*
+pnpm-debug.log*

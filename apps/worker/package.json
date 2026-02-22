@@ -1,0 +1,12 @@
+{
+  "name": "worker",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "start": "node -e \"setInterval(()=>{}, 1e9)\"",
+    "test": "echo 'No tests in Phase 1'"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
