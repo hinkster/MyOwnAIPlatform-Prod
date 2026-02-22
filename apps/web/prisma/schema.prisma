@@ -1,3 +1,5 @@
+// Phase 1 schema. Run: pnpm exec prisma migrate dev
+
 generator client {
   provider = "prisma-client-js"
 }
@@ -6,6 +8,10 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+// ---------------------------------------------------------------------------
+// User & org
+// ---------------------------------------------------------------------------
 
 model User {
   id           String    @id @default(cuid())
@@ -19,11 +25,11 @@ model User {
 }
 
 model Organization {
-  id        String   @id @default(cuid())
-  name      String
-  slug      String   @unique
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
+  id            String    @id @default(cuid())
+  name          String
+  slug          String    @unique
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
   memberships   Membership[]
   tenantConfig  TenantConfig?
   providerKeys  ProviderKey[]
@@ -37,6 +43,7 @@ model Membership {
   createdAt      DateTime @default(now()) @map("created_at")
   user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
   @@id([userId, organizationId])
 }
 
@@ -45,6 +52,10 @@ enum Role {
   ADMIN
   MEMBER
 }
+
+// ---------------------------------------------------------------------------
+// Tenant config & provider keys
+// ---------------------------------------------------------------------------
 
 model TenantConfig {
   id                  String   @id @default(cuid())
@@ -67,7 +78,10 @@ model ProviderKey {
   createdAt      DateTime @default(now()) @map("created_at")
   updatedAt      DateTime @updatedAt @map("updated_at")
   organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
   @@unique([organizationId, provider])
+  @@index([organizationId])
+  @@index([createdAt])
 }
 
 enum Provider {
@@ -75,6 +89,10 @@ enum Provider {
   ANTHROPIC
   GEMINI
 }
+
+// ---------------------------------------------------------------------------
+// Audit
+// ---------------------------------------------------------------------------
 
 model AuditLog {
   id             String   @id @default(cuid())
@@ -84,4 +102,7 @@ model AuditLog {
   createdAt      DateTime @default(now()) @map("created_at")
   metadata       Json?
   organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
+  @@index([createdAt])
 }

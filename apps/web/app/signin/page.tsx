@@ -33,10 +33,10 @@ export default function SignInPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#1A2A6C] flex items-center justify-center p-4">
-      <Card className="w-full max-w-md border-[#7D939F]/40">
+    <div className="min-h-screen bg-brand-primary flex items-center justify-center p-4">
+      <Card className="w-full max-w-md border-border">
         <CardHeader>
-          <CardTitle className="text-[#FBC549]">Sign in</CardTitle>
+          <CardTitle className="text-accent">Sign in</CardTitle>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -44,7 +44,7 @@ export default function SignInPage() {
               <p className="text-sm text-red-400">{error}</p>
             )}
             <div>
-              <label className="block text-sm text-[#7D939F] mb-1">Email</label>
+              <label className="block text-sm text-muted-foreground mb-1">Email</label>
               <Input
                 type="email"
                 value={email}
@@ -54,7 +54,7 @@ export default function SignInPage() {
               />
             </div>
             <div>
-              <label className="block text-sm text-[#7D939F] mb-1">Password</label>
+              <label className="block text-sm text-muted-foreground mb-1">Password</label>
               <Input
                 type="password"
                 value={password}
@@ -66,9 +66,9 @@ export default function SignInPage() {
               Sign in
             </Button>
           </form>
-          <p className="mt-4 text-sm text-[#7D939F] text-center">
+          <p className="mt-4 text-sm text-muted-foreground text-center">
             No account?{" "}
-            <Link href="/signup" className="text-[#FBC549] hover:underline">
+            <Link href="/signup" className="text-accent hover:underline">
               Sign up
             </Link>
           </p>

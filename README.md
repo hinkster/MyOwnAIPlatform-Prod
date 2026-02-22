@@ -1,50 +1,37 @@
 # makemyownmodel.ai
 
-Phase 1 greenfield foundation: mono-repo with Next.js (App Router), path-based multi-tenancy, encrypted provider keys, onboarding wizard, and Docker-first local dev.
+Phase 1: Docker-first, reproducible, tenant-safe foundation. Next.js App Router, path-based multi-tenancy, encrypted provider keys, onboarding wizard.
 
 ## Structure
 
-- **apps/web** — Next.js 14 App Router, Tailwind, shadcn-style UI, Prisma, NextAuth (Credentials)
-- **apps/worker** — Placeholder container for later background jobs
-- **packages/encryption** — AES-256-GCM encrypt/decrypt (APP_ENCRYPTION_KEY)
-- **packages/tenant-context** — `getTenantFromSlug`, `requireTenant`, `getTenantIdForRequest`
-- **infra** — Docker Compose (web, postgres, redis, qdrant, worker; optional ollama profile)
+- **apps/web** — Next.js 14 App Router, Tailwind, design tokens, Prisma, NextAuth (Credentials)
+- **apps/worker** — Placeholder container
+- **packages/encryption** — AES-256-GCM (APP_ENCRYPTION_KEY)
+- **packages/tenant-context** — `requireTenant`, `getTenantIdForRequest`, `assertNotDemoTenant`
+- **infra** — docker-compose.dev.yml (web, postgres, redis, qdrant, worker; ollama optional profile)
 - **docs** — START_LOCAL_DEV, DEVELOPMENT, SECURITY
 
-## One-command startup
+## One-command startup (Docker)
 
 ```bash
 # From repo root
-cp infra/.env.example .env
-# Edit .env: set APP_ENCRYPTION_KEY (e.g. 64-char hex from `openssl rand -hex 32`), NEXTAUTH_SECRET, NEXTAUTH_URL
+cp .env.example .env
+# Edit .env: set APP_ENCRYPTION_KEY (openssl rand -hex 32), NEXTAUTH_SECRET, NEXTAUTH_URL
 
 docker compose -f infra/docker-compose.dev.yml up
 ```
 
-Then open http://localhost:3000 and http://localhost:3000/api/health.
+Then: http://localhost:3000 and http://localhost:3000/api/health.
 
-Migrations and seed run in the web container on startup. To run seed manually after first up:
+Seed demo tenant (once):
 
 ```bash
 docker compose -f infra/docker-compose.dev.yml exec web sh -c "cd /app/apps/web && pnpm exec prisma db seed"
 ```
 
-## Running without Docker
+## Test gates (must pass for Phase 1 complete)
 
-See [docs/START_LOCAL_DEV.md](docs/START_LOCAL_DEV.md) and [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md).
-
-## Tests (gate)
-
-Run before considering Phase 1 complete:
-
-1. **Encryption round-trip** (packages/encryption):  
-   `pnpm --filter @makemyownmodel/encryption test`
-2. **Tenant isolation** (apps/web): User A cannot access Tenant B config/keys.  
-   `pnpm --filter web test` (requires DATABASE_URL and migrated DB; seed not required for isolation test, but demo lock test expects demo user).
-3. **Demo lock**: Updating provider keys for org slug `demo` returns 403.  
-   Same as above; demo user must exist (run seed).
-
-From repo root (with pnpm installed):
+From repo root with Node 18+ and pnpm installed:
 
 ```bash
 pnpm install
@@ -53,10 +40,22 @@ cd apps/web && pnpm exec prisma migrate deploy && pnpm exec prisma db seed
 pnpm --filter web test
 ```
 
+- **a) Encryption round-trip** — `pnpm --filter @makemyownmodel/encryption test`
+- **b) Tenant isolation** — User from org A cannot access org B (requireTenant/getTenantIdForRequest). Part of `pnpm --filter web test`.
+- **c) Demo lock** — Updating provider keys for org slug `demo` returns 403. Part of `pnpm --filter web test` (requires seed).
+
+## How to confirm Phase 1 is complete
+
+1. **Compose up** — `docker compose -f infra/docker-compose.dev.yml up` brings up web, postgres, redis, qdrant, worker without errors.
+2. **Health** — `curl http://localhost:3000/api/health` returns `{"status":"ok","postgres":"connected"}` (or `degraded` if DB not ready).
+3. **Gate tests** — All three above pass: encryption, tenant isolation, demo lock.
+4. **Demo tenant** — Seed run; `/t/demo` loads; settings for demo do not allow saving provider keys.
+5. **Sign up → onboarding** — New user gets an org, completes 6-step onboarding, lands on dashboard.
+
 ## Env vars
 
-See [infra/.env.example](infra/.env.example). Required: `DATABASE_URL`, `APP_ENCRYPTION_KEY` (32-byte hex or base64url), `NEXTAUTH_SECRET`, `NEXTAUTH_URL`. Optional: `REDIS_URL`, `QDRANT_URL`, `OLLAMA_BASE_URL` (with ollama profile).
+See [infra/.env.example](infra/.env.example) or root [.env.example](.env.example). Required: `DATABASE_URL`, `APP_ENCRYPTION_KEY`, `NEXTAUTH_SECRET`, `NEXTAUTH_URL`, `REDIS_URL`, `QDRANT_URL`. Optional: `OLLAMA_BASE_URL` (with ollama profile).
 
-## Phase 2 (outline)
+## Phase 2 (outline only)
 
-- OAuth providers; worker jobs; Ollama fallback; rate limiting; inference API; Qdrant RAG; audit expansion; tenant branding; E2E tests.
+OAuth, worker jobs, Ollama fallback, rate limiting, inference API, RAG, audit expansion, E2E tests.

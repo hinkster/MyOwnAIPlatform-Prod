@@ -2,6 +2,11 @@
 @tailwind components;
 @tailwind utilities;
 
+/*
+ * Phase 1 design tokens — brand palette
+ * primary navy: #1A2A6C | accent gold: #FBC549 (alt #EEAA33) | neutral steel: #7D939F
+ * Dark mode default.
+ */
 @layer base {
   :root {
     --background: 222 47% 11%;
@@ -21,6 +26,11 @@
     --input: 217 33% 25%;
     --ring: 43 96% 64%;
     --radius: 0.5rem;
+    /* Raw brand hex for components that need them */
+    --brand-primary: #1A2A6C;
+    --brand-accent: #FBC549;
+    --brand-accent-alt: #EEAA33;
+    --brand-steel: #7D939F;
   }
 
   .dark {
@@ -29,12 +39,15 @@
     --card: 222 47% 11%;
     --primary: 224 58% 26%;
     --accent: 43 96% 64%;
+    --brand-primary: #1A2A6C;
+    --brand-accent: #FBC549;
+    --brand-steel: #7D939F;
   }
 }
 
 @layer base {
   * {
-    @apply border-border;
+    @apply border-[hsl(var(--border))];
   }
   body {
     @apply bg-[hsl(var(--background))] text-[hsl(var(--foreground))];

@@ -27,16 +27,16 @@ export default async function TenantLayout({
   }
   return (
     <div className="flex min-h-screen bg-[#0f172a]">
-      <aside className="w-56 border-r border-[#7D939F]/30 flex flex-col">
-        <div className="p-4 border-b border-[#7D939F]/30">
+      <aside className="w-56 border-r border-border flex flex-col">
+        <div className="p-4 border-b border-border">
           <Link href={`/t/${slug}`} className="flex items-center gap-2">
-            <Image src="/logo.svg" alt="Logo" width={32} height={32} />
-            <span className="font-semibold text-[#7D939F]">{org.name}</span>
+            <Image src="/brand/logo.svg" alt="Logo" width={32} height={32} />
+            <span className="font-semibold text-brand-steel">{org.name}</span>
           </Link>
         </div>
         <TenantSidebar slug={slug} />
       </aside>
-      <main className="flex-1 overflow-auto">{children}</main>
+      <main className="flex-1 overflow-auto bg-background">{children}</main>
     </div>
   );
 }

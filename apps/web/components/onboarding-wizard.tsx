@@ -109,7 +109,7 @@ export function OnboardingWizard({
           <div
             key={i}
             className={`h-2 flex-1 rounded-full ${
-              i + 1 <= step ? "bg-[#FBC549]" : "bg-[#7D939F]/30"
+              i + 1 <= step ? "bg-accent" : "bg-muted"
             }`}
           />
         ))}
@@ -128,11 +128,11 @@ export function OnboardingWizard({
           >
             <Card>
               <CardHeader>
-                <CardTitle className="text-[#FBC549]">Organization</CardTitle>
+                <CardTitle className="text-accent">Organization</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
-                  <label className="block text-sm text-[#7D939F] mb-1">Organization name</label>
+                  <label className="block text-sm text-muted-foreground mb-1">Organization name</label>
                   <Input
                     value={organizationName}
                     onChange={(e) => setOrganizationName(e.target.value)}
@@ -140,7 +140,7 @@ export function OnboardingWizard({
                   />
                 </div>
                 <div>
-                  <label className="block text-sm text-[#7D939F] mb-1">Tenant slug (URL)</label>
+                  <label className="block text-sm text-muted-foreground mb-1">Tenant slug (URL)</label>
                   <Input
                     value={slugValue}
                     onChange={(e) => setSlugValue(e.target.value.replace(/[^a-z0-9-]/gi, "").toLowerCase())}
@@ -162,11 +162,11 @@ export function OnboardingWizard({
           >
             <Card>
               <CardHeader>
-                <CardTitle className="text-[#FBC549]">Primary use case</CardTitle>
+                <CardTitle className="text-accent">Primary use case</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <select
-                  className="flex h-10 w-full rounded-md border border-[#7D939F]/40 bg-transparent px-3 py-2 text-white"
+                  className="flex h-10 w-full rounded-md border border-input bg-transparent px-3 py-2 text-foreground"
                   value={useCase}
                   onChange={(e) => setUseCase(e.target.value)}
                 >
@@ -197,13 +197,13 @@ export function OnboardingWizard({
           >
             <Card>
               <CardHeader>
-                <CardTitle className="text-[#FBC549]">Provider API keys</CardTitle>
-                <p className="text-sm text-[#7D939F]">Stored encrypted. Enter at least one.</p>
+                <CardTitle className="text-accent">Provider API keys</CardTitle>
+                <p className="text-sm text-muted-foreground">Stored encrypted. Enter at least one.</p>
               </CardHeader>
               <CardContent className="space-y-4">
                 {PROVIDERS.map((p) => (
                   <div key={p}>
-                    <label className="block text-sm text-[#7D939F] mb-1">{p}</label>
+                    <label className="block text-sm text-muted-foreground mb-1">{p}</label>
                     <Input
                       type="password"
                       placeholder={`${p} API key`}
@@ -229,12 +229,12 @@ export function OnboardingWizard({
           >
             <Card>
               <CardHeader>
-                <CardTitle className="text-[#FBC549]">Provider order</CardTitle>
-                <p className="text-sm text-[#7D939F]">Default: OpenAI → Anthropic → Gemini</p>
+                <CardTitle className="text-accent">Provider order</CardTitle>
+                <p className="text-sm text-muted-foreground">Default: OpenAI → Anthropic → Gemini</p>
               </CardHeader>
               <CardContent className="space-y-2">
                 {providerOrder.map((p, i) => (
-                  <div key={p} className="flex items-center gap-2 text-[#7D939F]">
+                  <div key={p} className="flex items-center gap-2 text-muted-foreground">
                     <span className="w-6">{i + 1}.</span>
                     <span className="text-white">{p}</span>
                   </div>
@@ -254,7 +254,7 @@ export function OnboardingWizard({
           >
             <Card>
               <CardHeader>
-                <CardTitle className="text-[#FBC549]">Ollama fallback</CardTitle>
+                <CardTitle className="text-accent">Ollama fallback</CardTitle>
               </CardHeader>
               <CardContent>
                 <label className="flex items-center gap-2 cursor-pointer">
@@ -262,9 +262,9 @@ export function OnboardingWizard({
                     type="checkbox"
                     checked={allowOllamaFallback}
                     onChange={(e) => setAllowOllamaFallback(e.target.checked)}
-                    className="rounded border-[#7D939F]"
+                    className="rounded border-border"
                   />
-                  <span className="text-[#7D939F]">Allow fallback to local Ollama (default off)</span>
+                  <span className="text-muted-foreground">Allow fallback to local Ollama (default off)</span>
                 </label>
               </CardContent>
             </Card>
@@ -281,17 +281,17 @@ export function OnboardingWizard({
           >
             <Card>
               <CardHeader>
-                <CardTitle className="text-[#FBC549]">Branding (optional)</CardTitle>
+                <CardTitle className="text-accent">Branding (optional)</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
-                  <label className="block text-sm text-[#7D939F] mb-1">Primary color</label>
+                  <label className="block text-sm text-muted-foreground mb-1">Primary color</label>
                   <div className="flex gap-2 items-center">
                     <input
                       type="color"
                       value={primaryColor}
                       onChange={(e) => setPrimaryColor(e.target.value)}
-                      className="w-12 h-10 rounded cursor-pointer border border-[#7D939F]/40"
+                      className="w-12 h-10 rounded cursor-pointer border border-input"
                     />
                     <Input
                       value={primaryColor}
@@ -301,7 +301,7 @@ export function OnboardingWizard({
                   </div>
                 </div>
                 <div
-                  className="rounded-lg p-4 border border-[#7D939F]/30"
+                  className="rounded-lg p-4 border border-border"
                   style={{ backgroundColor: primaryColor }}
                 >
                   <p className="text-white/90 text-sm">Preview: your primary color</p>

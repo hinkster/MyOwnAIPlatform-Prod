@@ -24,14 +24,14 @@ export default async function DashboardPage({
     <div className="p-8">
       <h1 className="text-2xl font-bold text-white mb-6">
         Dashboard
-        {org && <span className="text-[#7D939F] font-normal"> · {org.name}</span>}
+        {org && <span className="text-muted-foreground font-normal"> · {org.name}</span>}
       </h1>
       <div className="grid gap-4 md:grid-cols-2">
         <Card>
           <CardHeader>
-            <CardTitle className="text-[#FBC549]">Getting started</CardTitle>
+            <CardTitle className="text-accent">Getting started</CardTitle>
           </CardHeader>
-          <CardContent className="text-[#7D939F]">
+          <CardContent className="text-muted-foreground">
             {config
               ? "Your organization is set up. Adjust provider keys and branding in Settings."
               : "Complete onboarding to configure your organization."}
@@ -39,9 +39,9 @@ export default async function DashboardPage({
         </Card>
         <Card>
           <CardHeader>
-            <CardTitle className="text-[#FBC549]">Use case</CardTitle>
+            <CardTitle className="text-accent">Use case</CardTitle>
           </CardHeader>
-          <CardContent className="text-[#7D939F]">
+          <CardContent className="text-muted-foreground">
             {config?.useCase ?? "Not set"}
           </CardContent>
         </Card>

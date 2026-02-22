@@ -19,14 +19,14 @@ export default async function TenantHomePage({
     return (
       <div className="p-8">
         <h1 className="text-2xl font-bold text-white mb-2">Demo tenant</h1>
-        <p className="text-[#7D939F] mb-6">
+        <p className="text-muted-foreground mb-6">
           This is the locked demo organization. You can view the dashboard but cannot change provider keys.
         </p>
         <Card>
           <CardHeader>
-            <CardTitle className="text-[#FBC549]">Try it</CardTitle>
+            <CardTitle className="text-accent">Try it</CardTitle>
           </CardHeader>
-          <CardContent className="text-[#7D939F]">
+          <CardContent className="text-muted-foreground">
             Sign in as demo@makemyownmodel.ai / demo-password to explore the app with the demo org.
           </CardContent>
         </Card>
@@ -47,7 +47,7 @@ export default async function TenantHomePage({
     return (
       <div className="p-8">
         <h1 className="text-2xl font-bold text-white">{org.name}</h1>
-        <p className="text-[#7D939F] mt-2">Sign in to access this organization.</p>
+        <p className="text-muted-foreground mt-2">Sign in to access this organization.</p>
         <Button asChild className="mt-4">
           <Link href={`/signin?callbackUrl=/t/${slug}/dashboard`}>Sign in</Link>
         </Button>
@@ -62,7 +62,7 @@ export default async function TenantHomePage({
   return (
     <div className="p-8">
       <h1 className="text-2xl font-bold text-white">{org.name}</h1>
-      <p className="text-[#7D939F] mt-2 mb-6">Welcome. Continue to your workspace.</p>
+      <p className="text-muted-foreground mt-2 mb-6">Welcome. Continue to your workspace.</p>
       <Button asChild>
         <Link href={next}>{config?.useCase ? "Go to Dashboard" : "Complete onboarding"}</Link>
       </Button>

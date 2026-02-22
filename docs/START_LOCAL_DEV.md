@@ -12,8 +12,9 @@
    From repo root:
 
    ```bash
-   cp infra/.env.example .env
+   cp .env.example .env
    ```
+   (Or `cp infra/.env.example .env`; both are consistent.)
 
 2. **Set required variables in `.env`**
 
@@ -32,7 +33,7 @@
    docker compose -f infra/docker-compose.dev.yml up
    ```
 
-   This starts: **web** (Next.js on 3000), **postgres** (5432), **redis** (6379), **qdrant** (6333), **worker** (placeholder). The web service runs `pnpm install`, `prisma generate`, `prisma migrate deploy`, and `pnpm dev`.
+   This starts: **web** (Next.js on 3000), **postgres** (5432), **redis** (6379), **qdrant** (6333), **worker** (placeholder). The web service uses named volumes for `node_modules` so dependencies are not reinstalled on every start; it runs `pnpm install`, `prisma generate`, `prisma migrate deploy`, and `pnpm dev`.
 
 4. **Seed demo tenant (first time)**
 

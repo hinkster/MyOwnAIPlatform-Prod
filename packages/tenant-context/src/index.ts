@@ -1,5 +1,19 @@
-export type Organization = { id: string; name: string; slug: string };
-export type Membership = { userId: string; organizationId: string; role: string };
+/**
+ * Tenant context helpers. Use only on the server.
+ * Never trust tenantId from the client; always resolve from slug + userId.
+ */
+
+export type Organization = {
+  id: string;
+  name: string;
+  slug: string;
+};
+
+export type Membership = {
+  userId: string;
+  organizationId: string;
+  role: string;
+};
 
 export interface TenantContextDb {
   organization: {
@@ -23,6 +37,20 @@ export class TenantNotFoundError extends Error {
   constructor(message: string = "Tenant not found") {
     super(message);
     this.name = "TenantNotFoundError";
+  }
+}
+
+export class DemoTenantLockedError extends Error {
+  constructor(message: string = "Demo tenant cannot be modified") {
+    super(message);
+    this.name = "DemoTenantLockedError";
+  }
+}
+
+/** Throws 403 for key-mutation routes when org is the demo tenant. Call after requireTenant. */
+export function assertNotDemoTenant(orgSlug: string): void {
+  if (orgSlug === "demo") {
+    throw new DemoTenantLockedError("Demo tenant cannot modify provider keys or config");
   }
 }
 
@@ -58,7 +86,9 @@ export async function requireTenant(
 }
 
 /**
- * Returns organizationId for the given slug after verifying membership. Use in all server actions and API routes that touch tenant data.
+ * Returns organizationId for the given slug after verifying membership.
+ * Use in all server actions and API routes that touch tenant data.
+ * Never use tenantId from the client.
  */
 export async function getTenantIdForRequest(
   db: TenantContextDb,

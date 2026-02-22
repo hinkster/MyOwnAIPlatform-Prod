@@ -96,9 +96,9 @@ export function ProviderSettings({
       {PROVIDERS.map((provider) => (
         <Card key={provider}>
           <CardHeader>
-            <CardTitle className="text-[#FBC549]">{provider}</CardTitle>
+            <CardTitle className="text-accent">{provider}</CardTitle>
             {providersWithKey.includes(provider) && (
-              <p className="text-sm text-[#7D939F]">Key configured (not shown)</p>
+              <p className="text-sm text-muted-foreground">Key configured (not shown)</p>
             )}
           </CardHeader>
           <CardContent className="space-y-2">

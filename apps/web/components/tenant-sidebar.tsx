@@ -22,8 +22,8 @@ export function TenantSidebar({ slug }: { slug: string }) {
             href={h}
             className={`block px-3 py-2 rounded-md text-sm ${
               active
-                ? "bg-[#1A2A6C] text-[#FBC549]"
-                : "text-[#7D939F] hover:bg-white/5 hover:text-white"
+                ? "bg-primary text-accent"
+                : "text-muted-foreground hover:bg-white/5 hover:text-white"
             }`}
           >
             {label}

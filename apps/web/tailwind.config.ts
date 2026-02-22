@@ -10,18 +10,40 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
+        background: "hsl(var(--background))",
+        foreground: "hsl(var(--foreground))",
+        card: {
+          DEFAULT: "hsl(var(--card))",
+          foreground: "hsl(var(--card-foreground))",
+        },
         primary: {
-          DEFAULT: "#1A2A6C",
-          foreground: "#f8fafc",
+          DEFAULT: "hsl(var(--primary))",
+          foreground: "hsl(var(--primary-foreground))",
         },
         accent: {
-          DEFAULT: "#FBC549",
-          alt: "#EEAA33",
-          foreground: "#0f172a",
+          DEFAULT: "hsl(var(--accent))",
+          foreground: "hsl(var(--accent-foreground))",
         },
-        steel: {
-          DEFAULT: "#7D939F",
+        muted: {
+          DEFAULT: "hsl(var(--muted))",
+          foreground: "hsl(var(--muted-foreground))",
         },
+        border: "hsl(var(--border))",
+        input: "hsl(var(--input))",
+        ring: "hsl(var(--ring))",
+        destructive: "hsl(var(--destructive))",
+        // Brand aliases (map to CSS vars)
+        brand: {
+          primary: "var(--brand-primary)",
+          accent: "var(--brand-accent)",
+          "accent-alt": "var(--brand-accent-alt)",
+          steel: "var(--brand-steel)",
+        },
+      },
+      borderRadius: {
+        lg: "var(--radius)",
+        md: "calc(var(--radius) - 2px)",
+        sm: "calc(var(--radius) - 4px)",
       },
     },
   },

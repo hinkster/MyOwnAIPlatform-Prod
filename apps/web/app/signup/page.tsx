@@ -36,10 +36,10 @@ export default function SignUpPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#1A2A6C] flex items-center justify-center p-4">
-      <Card className="w-full max-w-md border-[#7D939F]/40">
+    <div className="min-h-screen bg-brand-primary flex items-center justify-center p-4">
+      <Card className="w-full max-w-md border-border">
         <CardHeader>
-          <CardTitle className="text-[#FBC549]">Sign up</CardTitle>
+          <CardTitle className="text-accent">Sign up</CardTitle>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -47,7 +47,7 @@ export default function SignUpPage() {
               <p className="text-sm text-red-400">{error}</p>
             )}
             <div>
-              <label className="block text-sm text-[#7D939F] mb-1">Name</label>
+              <label className="block text-sm text-muted-foreground mb-1">Name</label>
               <Input
                 type="text"
                 value={name}
@@ -56,7 +56,7 @@ export default function SignUpPage() {
               />
             </div>
             <div>
-              <label className="block text-sm text-[#7D939F] mb-1">Email</label>
+              <label className="block text-sm text-muted-foreground mb-1">Email</label>
               <Input
                 type="email"
                 value={email}
@@ -66,7 +66,7 @@ export default function SignUpPage() {
               />
             </div>
             <div>
-              <label className="block text-sm text-[#7D939F] mb-1">Password</label>
+              <label className="block text-sm text-muted-foreground mb-1">Password</label>
               <Input
                 type="password"
                 value={password}
@@ -79,9 +79,9 @@ export default function SignUpPage() {
               Create account
             </Button>
           </form>
-          <p className="mt-4 text-sm text-[#7D939F] text-center">
+          <p className="mt-4 text-sm text-muted-foreground text-center">
             Already have an account?{" "}
-            <Link href="/signin" className="text-[#FBC549] hover:underline">
+            <Link href="/signin" className="text-accent hover:underline">
               Sign in
             </Link>
           </p>

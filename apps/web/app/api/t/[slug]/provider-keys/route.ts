@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import { getTenantIdForRequest } from "@makemyownmodel/tenant-context";
+import { requireTenant, assertNotDemoTenant, DemoTenantLockedError } from "@makemyownmodel/tenant-context";
 import { prisma } from "@/lib/prisma";
 import { encrypt } from "@makemyownmodel/encryption";
 import { z } from "zod";
@@ -20,21 +20,22 @@ export async function POST(
   if (!session?.user?.id) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
-  const org = await prisma.organization.findUnique({ where: { slug } });
-  if (!org) {
-    return NextResponse.json({ error: "Not found" }, { status: 404 });
-  }
-  const membership = await prisma.membership.findFirst({
-    where: { userId: session.user.id, organizationId: org.id },
-  });
-  if (!membership) {
+  let org;
+  try {
+    org = await requireTenant(prisma as any, slug, session.user.id);
+  } catch {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
-  if (org.slug === "demo") {
-    return NextResponse.json(
-      { error: "Demo tenant cannot modify provider keys" },
-      { status: 403 }
-    );
+  try {
+    assertNotDemoTenant(org.slug);
+  } catch (e) {
+    if (e instanceof DemoTenantLockedError) {
+      return NextResponse.json(
+        { error: "Demo tenant cannot modify provider keys" },
+        { status: 403 }
+      );
+    }
+    throw e;
   }
   const parsed = bodySchema.safeParse(await req.json());
   if (!parsed.success) {
