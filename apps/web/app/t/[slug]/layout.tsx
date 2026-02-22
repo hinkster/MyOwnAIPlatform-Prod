@@ -2,7 +2,7 @@ import { getServerSession } from "next-auth";
 import { redirect, notFound } from "next/navigation";
 import { authOptions } from "@/lib/auth";
 import { requireTenant } from "@makemyownmodel/tenant-context";
-import { prisma } from "@/lib/prisma";
+import { tenantDb } from "@/lib/tenant-db";
 import { TenantSidebar } from "@/components/tenant-sidebar";
 import Link from "next/link";
 import Image from "next/image";
@@ -12,16 +12,16 @@ export default async function TenantLayout({
   params,
 }: {
   children: React.ReactNode;
-  params: Promise<{ slug: string }>;
+  params: { slug: string };
 }) {
   const session = await getServerSession(authOptions);
-  const { slug } = await params;
+  const { slug } = params;
   if (!session?.user?.id) {
     redirect("/signin?callbackUrl=" + encodeURIComponent(`/t/${slug}`));
   }
   let org;
   try {
-    org = await requireTenant(prisma as any, slug, session.user.id);
+    org = await requireTenant(tenantDb, slug, session.user.id);
   } catch {
     notFound();
   }

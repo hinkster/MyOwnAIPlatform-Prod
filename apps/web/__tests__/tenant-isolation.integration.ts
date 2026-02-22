@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeAll, afterAll } from "vitest";
 import { requireTenant, getTenantIdForRequest, TenantForbiddenError } from "@makemyownmodel/tenant-context";
+import { tenantDb } from "@/lib/tenant-db";
 import { prisma } from "@/lib/prisma";
 
 const SLUG_A = "test-iso-a-" + Date.now();
@@ -70,23 +71,23 @@ describe("tenant isolation", () => {
 
   it("requireTenant(prisma, B.slug, userA.id) throws TenantForbiddenError", async () => {
     await expect(
-      requireTenant(prisma as any, SLUG_B, userAId)
+      requireTenant(tenantDb, SLUG_B, userAId)
     ).rejects.toThrow(TenantForbiddenError);
   });
 
   it("getTenantIdForRequest(prisma, B.slug, userA.id) throws", async () => {
     await expect(
-      getTenantIdForRequest(prisma as any, SLUG_B, userAId)
+      getTenantIdForRequest(tenantDb, SLUG_B, userAId)
     ).rejects.toThrow();
   });
 
   it("getTenantIdForRequest(prisma, A.slug, userA.id) returns org A id", async () => {
-    const tenantId = await getTenantIdForRequest(prisma as any, SLUG_A, userAId);
+    const tenantId = await getTenantIdForRequest(tenantDb, SLUG_A, userAId);
     expect(tenantId).toBe(orgAId);
   });
 
   it("user A cannot read tenant B config when scoped by tenantId", async () => {
-    const tenantId = await getTenantIdForRequest(prisma as any, SLUG_A, userAId);
+    const tenantId = await getTenantIdForRequest(tenantDb, SLUG_A, userAId);
     const configs = await prisma.tenantConfig.findMany({
       where: { organizationId: tenantId },
     });

@@ -13,20 +13,22 @@ Phase 1: Docker-first, reproducible, tenant-safe foundation. Next.js App Router,
 
 ## One-command startup (Docker)
 
+From a fresh clone:
+
 ```bash
 # From repo root
 cp .env.example .env
 # Edit .env: set APP_ENCRYPTION_KEY (openssl rand -hex 32), NEXTAUTH_SECRET, NEXTAUTH_URL
 
-docker compose -f infra/docker-compose.dev.yml up
+docker compose -f infra/docker-compose.dev.yml up --build
 ```
 
-Then: http://localhost:3000 and http://localhost:3000/api/health.
+Then: http://localhost:3000 and http://localhost:3000/api/health. Dependencies are installed in the image; no `pnpm install` runs in the container.
 
 Seed demo tenant (once):
 
 ```bash
-docker compose -f infra/docker-compose.dev.yml exec web sh -c "cd /app/apps/web && pnpm exec prisma db seed"
+docker compose -f infra/docker-compose.dev.yml exec web pnpm exec prisma db seed
 ```
 
 ## Test gates (must pass for Phase 1 complete)
@@ -35,6 +37,8 @@ From repo root with Node 18+ and pnpm installed:
 
 ```bash
 pnpm install
+pnpm format:check
+pnpm lint
 pnpm --filter @makemyownmodel/encryption test
 cd apps/web && pnpm exec prisma migrate deploy && pnpm exec prisma db seed
 pnpm --filter web test
@@ -46,7 +50,7 @@ pnpm --filter web test
 
 ## How to confirm Phase 1 is complete
 
-1. **Compose up** — `docker compose -f infra/docker-compose.dev.yml up` brings up web, postgres, redis, qdrant, worker without errors.
+1. **Compose up** — `docker compose -f infra/docker-compose.dev.yml up --build` brings up web, postgres, redis, qdrant, worker without errors.
 2. **Health** — `curl http://localhost:3000/api/health` returns `{"status":"ok","postgres":"connected"}` (or `degraded` if DB not ready).
 3. **Gate tests** — All three above pass: encryption, tenant isolation, demo lock.
 4. **Demo tenant** — Seed run; `/t/demo` loads; settings for demo do not allow saving provider keys.

@@ -5,12 +5,16 @@
     "dev": "pnpm --filter web dev",
     "build": "pnpm --filter web build",
     "test": "pnpm -r test",
+    "lint": "pnpm --filter web lint",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
     "db:generate": "pnpm --filter web exec prisma generate",
     "db:migrate": "pnpm --filter web exec prisma migrate deploy",
     "db:seed": "pnpm --filter web exec prisma db seed",
     "db:push": "pnpm --filter web exec prisma db push"
   },
   "devDependencies": {
+    "prettier": "^3.2.5",
     "typescript": "^5.3.3"
   },
   "packageManager": "pnpm@9.0.0",

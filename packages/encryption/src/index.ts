@@ -3,16 +3,32 @@ import { createCipheriv, createDecipheriv, randomBytes } from "node:crypto";
 const ALGORITHM = "aes-256-gcm";
 const IV_LENGTH = 16;
 const TAG_LENGTH = 16;
+const KEY_LENGTH = 32;
 
+/**
+ * Parse APP_ENCRYPTION_KEY: 64-char hex => 32 bytes, or base64url => 32 bytes. Otherwise throws.
+ */
 function getKey(envKey: string): Buffer {
   const raw = process.env[envKey] ?? "";
-  if (!raw || raw.length < 32) {
-    throw new Error("APP_ENCRYPTION_KEY must be set and at least 32 characters (32-byte hex or base64)");
+  if (!raw) {
+    throw new Error("APP_ENCRYPTION_KEY must be set (64-char hex or 43+ char base64url)");
   }
-  if (Buffer.isEncoding("hex") && /^[0-9a-fA-F]+$/.test(raw) && raw.length === 64) {
+  // 64-char hex => 32 bytes
+  if (/^[0-9a-fA-F]{64}$/.test(raw)) {
     return Buffer.from(raw, "hex");
   }
-  return Buffer.from(raw, "base64url");
+  // base64url => must decode to exactly 32 bytes
+  try {
+    const decoded = Buffer.from(raw, "base64url");
+    if (decoded.length === KEY_LENGTH) {
+      return decoded;
+    }
+  } catch {
+    // fall through to throw
+  }
+  throw new Error(
+    "APP_ENCRYPTION_KEY must be 64-char hex or base64url string that decodes to 32 bytes"
+  );
 }
 
 /**
@@ -21,7 +37,7 @@ function getKey(envKey: string): Buffer {
  */
 export function encrypt(plaintext: string, key?: Buffer): string {
   const keyBuf = key ?? getKey("APP_ENCRYPTION_KEY");
-  if (keyBuf.length !== 32) {
+  if (keyBuf.length !== KEY_LENGTH) {
     throw new Error("Encryption key must be 32 bytes");
   }
   const iv = randomBytes(IV_LENGTH);
@@ -37,7 +53,7 @@ export function encrypt(plaintext: string, key?: Buffer): string {
  */
 export function decrypt(ciphertext: string, key?: Buffer): string {
   const keyBuf = key ?? getKey("APP_ENCRYPTION_KEY");
-  if (keyBuf.length !== 32) {
+  if (keyBuf.length !== KEY_LENGTH) {
     throw new Error("Encryption key must be 32 bytes");
   }
   const combined = Buffer.from(ciphertext, "base64url");

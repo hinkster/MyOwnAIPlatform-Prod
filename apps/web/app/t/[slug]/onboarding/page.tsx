@@ -1,6 +1,7 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { getTenantIdForRequest } from "@makemyownmodel/tenant-context";
+import { tenantDb } from "@/lib/tenant-db";
 import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import { OnboardingWizard } from "@/components/onboarding-wizard";
@@ -8,12 +9,12 @@ import { OnboardingWizard } from "@/components/onboarding-wizard";
 export default async function OnboardingPage({
   params,
 }: {
-  params: Promise<{ slug: string }>;
+  params: { slug: string };
 }) {
   const session = await getServerSession(authOptions);
-  const { slug } = await params;
+  const { slug } = params;
   if (!session?.user?.id) return null;
-  const tenantId = await getTenantIdForRequest(prisma as any, slug, session.user.id);
+  const tenantId = await getTenantIdForRequest(tenantDb, slug, session.user.id);
   const config = await prisma.tenantConfig.findUnique({
     where: { organizationId: tenantId },
   });

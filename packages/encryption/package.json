@@ -10,7 +10,7 @@
     "dev": "tsc --watch"
   },
   "devDependencies": {
-    "@vitest/config": "^1.2.0",
+    "@types/node": "^20.14.0",
     "typescript": "^5.3.3",
     "vitest": "^1.2.0"
   },

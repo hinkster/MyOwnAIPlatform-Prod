@@ -32,7 +32,7 @@ describe("demo tenant lock", () => {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ provider: "OPENAI", key: "sk-test" }),
     });
-    const res = await POST(req, { params: Promise.resolve({ slug: "demo" }) });
+    const res = await POST(req, { params: { slug: "demo" } });
     expect(res.status).toBe(403);
     const data = await res.json();
     expect(data.error).toContain("Demo tenant");

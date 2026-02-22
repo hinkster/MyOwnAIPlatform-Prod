@@ -1,0 +1,59 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  lint-and-test:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: makemyownmodel_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "pnpm"
+
+      - name: Install
+        run: pnpm install
+
+      - name: Format check
+        run: pnpm format:check
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Test encryption
+        run: pnpm --filter @makemyownmodel/encryption test
+
+      - name: Migrate and seed DB
+        run: cd apps/web && pnpm exec prisma migrate deploy && pnpm exec prisma db seed
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/makemyownmodel_test
+
+      - name: Test web
+        run: pnpm --filter web test
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/makemyownmodel_test

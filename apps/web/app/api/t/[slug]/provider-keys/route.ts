@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { requireTenant, assertNotDemoTenant, DemoTenantLockedError } from "@makemyownmodel/tenant-context";
+import { tenantDb } from "@/lib/tenant-db";
 import { prisma } from "@/lib/prisma";
 import { encrypt } from "@makemyownmodel/encryption";
 import { z } from "zod";
@@ -13,16 +14,16 @@ const bodySchema = z.object({
 
 export async function POST(
   req: NextRequest,
-  { params }: { params: Promise<{ slug: string }> }
+  { params }: { params: { slug: string } }
 ) {
   const session = await getServerSession(authOptions);
-  const { slug } = await params;
+  const { slug } = params;
   if (!session?.user?.id) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
   let org;
   try {
-    org = await requireTenant(prisma as any, slug, session.user.id);
+    org = await requireTenant(tenantDb, slug, session.user.id);
   } catch {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }

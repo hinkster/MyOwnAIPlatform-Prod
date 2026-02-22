@@ -1,6 +1,7 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { getTenantFromSlug } from "@makemyownmodel/tenant-context";
+import { tenantDb } from "@/lib/tenant-db";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -9,10 +10,10 @@ import { Button } from "@/components/ui/button";
 export default async function TenantHomePage({
   params,
 }: {
-  params: Promise<{ slug: string }>;
+  params: { slug: string };
 }) {
-  const { slug } = await params;
-  const org = await getTenantFromSlug(prisma as any, slug);
+  const { slug } = params;
+  const org = await getTenantFromSlug(tenantDb, slug);
   if (!org) return null;
 
   if (slug === "demo") {
