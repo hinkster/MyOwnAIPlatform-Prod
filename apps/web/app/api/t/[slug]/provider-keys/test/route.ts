@@ -5,7 +5,7 @@ import { getTenantIdForRequest } from "@makemyownmodel/tenant-context";
 import { tenantDb } from "@/lib/tenant-db";
 import { z } from "zod";
 
-const TEST_TIMEOUT_MS = 6_000; // 5–8s range
+const TEST_TIMEOUT_MS = 6_000;
 
 const bodySchema = z.object({
   provider: z.enum(["OPENAI", "ANTHROPIC", "GEMINI"]),
@@ -68,7 +68,10 @@ async function testGemini(key: string): Promise<boolean> {
   }
 }
 
-export async function POST(req: NextRequest, { params }: { params: { slug: string } }) {
+export async function POST(
+  req: NextRequest,
+  { params }: { params: { slug: string } }
+) {
   const session = await getServerSession(authOptions);
   const { slug } = params;
   if (!session?.user?.id) {
