@@ -18,15 +18,16 @@ export async function POST(req: NextRequest) {
     );
   }
   const { name, email, password } = parsed.data;
-  const existing = await prisma.user.findUnique({ where: { email } });
+  const emailLower = email.trim().toLowerCase();
+  const existing = await prisma.user.findUnique({ where: { email: emailLower } });
   if (existing) {
     return NextResponse.json({ error: "Email already registered" }, { status: 409 });
   }
   const passwordHash = await hash(password, 10);
   const user = await prisma.user.create({
-    data: { email, name: name ?? null, passwordHash },
+    data: { email: emailLower, name: name?.trim() ?? null, passwordHash },
   });
-  const baseSlug = email.replace(/@.*/, "").replace(/[^a-z0-9]/gi, "").toLowerCase() || "org";
+  const baseSlug = emailLower.replace(/@.*/, "").replace(/[^a-z0-9]/gi, "") || "org";
   let slug = baseSlug;
   let n = 0;
   while (await prisma.organization.findUnique({ where: { slug } })) {

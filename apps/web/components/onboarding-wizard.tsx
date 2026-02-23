@@ -42,14 +42,21 @@ export function OnboardingWizard({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(stepData),
       });
-      const data = await res.json();
+      const text = await res.text();
+      let data: { error?: string } = {};
+      try {
+        data = text ? JSON.parse(text) : {};
+      } catch {
+        setError(res.ok ? "Request failed" : text || `Error ${res.status}`);
+        return false;
+      }
       if (!res.ok) {
-        setError(data.error ?? "Failed to save");
+        setError(data.error ?? `Error ${res.status}`);
         return false;
       }
       return true;
-    } catch {
-      setError("Request failed");
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Request failed");
       return false;
     } finally {
       setLoading(false);
@@ -108,9 +115,7 @@ export function OnboardingWizard({
         {Array.from({ length: STEPS }, (_, i) => (
           <div
             key={i}
-            className={`h-2 flex-1 rounded-full ${
-              i + 1 <= step ? "bg-accent" : "bg-muted"
-            }`}
+            className={`h-2 flex-1 rounded-full ${i + 1 <= step ? "bg-accent" : "bg-muted"}`}
           />
         ))}
       </div>
@@ -132,7 +137,9 @@ export function OnboardingWizard({
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
-                  <label className="block text-sm text-muted-foreground mb-1">Organization name</label>
+                  <label className="block text-sm text-muted-foreground mb-1">
+                    Organization name
+                  </label>
                   <Input
                     value={organizationName}
                     onChange={(e) => setOrganizationName(e.target.value)}
@@ -140,10 +147,14 @@ export function OnboardingWizard({
                   />
                 </div>
                 <div>
-                  <label className="block text-sm text-muted-foreground mb-1">Tenant slug (URL)</label>
+                  <label className="block text-sm text-muted-foreground mb-1">
+                    Tenant slug (URL)
+                  </label>
                   <Input
                     value={slugValue}
-                    onChange={(e) => setSlugValue(e.target.value.replace(/[^a-z0-9-]/gi, "").toLowerCase())}
+                    onChange={(e) =>
+                      setSlugValue(e.target.value.replace(/[^a-z0-9-]/gi, "").toLowerCase())
+                    }
                     placeholder="acme"
                   />
                 </div>
@@ -172,7 +183,9 @@ export function OnboardingWizard({
                 >
                   <option value="">Select…</option>
                   {USE_CASES.map((u) => (
-                    <option key={u} value={u}>{u}</option>
+                    <option key={u} value={u}>
+                      {u}
+                    </option>
                   ))}
                 </select>
                 {useCase === "Other" && (
@@ -198,7 +211,9 @@ export function OnboardingWizard({
             <Card>
               <CardHeader>
                 <CardTitle className="text-accent">Provider API keys</CardTitle>
-                <p className="text-sm text-muted-foreground">Stored encrypted. Enter at least one.</p>
+                <p className="text-sm text-muted-foreground">
+                  Stored encrypted. Enter at least one.
+                </p>
               </CardHeader>
               <CardContent className="space-y-4">
                 {PROVIDERS.map((p) => (
@@ -230,7 +245,9 @@ export function OnboardingWizard({
             <Card>
               <CardHeader>
                 <CardTitle className="text-accent">Provider order</CardTitle>
-                <p className="text-sm text-muted-foreground">Default: OpenAI → Anthropic → Gemini</p>
+                <p className="text-sm text-muted-foreground">
+                  Default: OpenAI → Anthropic → Gemini
+                </p>
               </CardHeader>
               <CardContent className="space-y-2">
                 {providerOrder.map((p, i) => (
@@ -264,7 +281,9 @@ export function OnboardingWizard({
                     onChange={(e) => setAllowOllamaFallback(e.target.checked)}
                     className="rounded border-border"
                   />
-                  <span className="text-muted-foreground">Allow fallback to local Ollama (default off)</span>
+                  <span className="text-muted-foreground">
+                    Allow fallback to local Ollama (default off)
+                  </span>
                 </label>
               </CardContent>
             </Card>

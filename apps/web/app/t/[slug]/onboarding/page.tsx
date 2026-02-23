@@ -1,20 +1,35 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import { getTenantIdForRequest } from "@makemyownmodel/tenant-context";
+import { getTenantIdForRequest, TenantNotFoundError } from "@makemyownmodel/tenant-context";
 import { tenantDb } from "@/lib/tenant-db";
 import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import { OnboardingWizard } from "@/components/onboarding-wizard";
 
-export default async function OnboardingPage({
-  params,
-}: {
-  params: { slug: string };
-}) {
+export default async function OnboardingPage({ params }: { params: { slug: string } }) {
   const session = await getServerSession(authOptions);
   const { slug } = params;
   if (!session?.user?.id) return null;
-  const tenantId = await getTenantIdForRequest(tenantDb, slug, session.user.id);
+
+  let tenantId: string;
+  try {
+    tenantId = await getTenantIdForRequest(tenantDb, slug, session.user.id);
+  } catch (err) {
+    if (err instanceof TenantNotFoundError) {
+      const memberships = await prisma.membership.findMany({
+        where: { userId: session.user.id },
+        include: { organization: true },
+        orderBy: { createdAt: "asc" },
+      });
+      const org = memberships[0]?.organization;
+      if (org) {
+        redirect(`/t/${org.slug}/onboarding`);
+      }
+      redirect("/");
+    }
+    throw err;
+  }
+
   const config = await prisma.tenantConfig.findUnique({
     where: { organizationId: tenantId },
   });

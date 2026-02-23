@@ -89,9 +89,7 @@ export function ProviderSettings({
         </Card>
       )}
       {message && (
-        <p className={message.type === "ok" ? "text-green-400" : "text-red-400"}>
-          {message.text}
-        </p>
+        <p className={message.type === "ok" ? "text-green-400" : "text-red-400"}>{message.text}</p>
       )}
       {PROVIDERS.map((provider) => (
         <Card key={provider}>
@@ -104,7 +102,9 @@ export function ProviderSettings({
           <CardContent className="space-y-2">
             <Input
               type="password"
-              placeholder={providersWithKey.includes(provider) ? "Enter new key to replace" : "API key"}
+              placeholder={
+                providersWithKey.includes(provider) ? "Enter new key to replace" : "API key"
+              }
               value={keys[provider] ?? ""}
               onChange={(e) => setKeys((prev) => ({ ...prev, [provider]: e.target.value }))}
               disabled={isDemo}

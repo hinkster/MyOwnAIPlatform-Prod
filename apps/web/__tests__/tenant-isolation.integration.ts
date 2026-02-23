@@ -1,5 +1,9 @@
 import { describe, it, expect, beforeAll, afterAll } from "vitest";
-import { requireTenant, getTenantIdForRequest, TenantForbiddenError } from "@makemyownmodel/tenant-context";
+import {
+  requireTenant,
+  getTenantIdForRequest,
+  TenantForbiddenError,
+} from "@makemyownmodel/tenant-context";
 import { tenantDb } from "@/lib/tenant-db";
 import { prisma } from "@/lib/prisma";
 
@@ -70,15 +74,11 @@ describe("tenant isolation", () => {
   });
 
   it("requireTenant(prisma, B.slug, userA.id) throws TenantForbiddenError", async () => {
-    await expect(
-      requireTenant(tenantDb, SLUG_B, userAId)
-    ).rejects.toThrow(TenantForbiddenError);
+    await expect(requireTenant(tenantDb, SLUG_B, userAId)).rejects.toThrow(TenantForbiddenError);
   });
 
   it("getTenantIdForRequest(prisma, B.slug, userA.id) throws", async () => {
-    await expect(
-      getTenantIdForRequest(tenantDb, SLUG_B, userAId)
-    ).rejects.toThrow();
+    await expect(getTenantIdForRequest(tenantDb, SLUG_B, userAId)).rejects.toThrow();
   });
 
   it("getTenantIdForRequest(prisma, A.slug, userA.id) returns org A id", async () => {

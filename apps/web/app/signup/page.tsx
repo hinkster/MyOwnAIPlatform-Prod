@@ -43,9 +43,7 @@ export default function SignUpPage() {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
-            {error && (
-              <p className="text-sm text-red-400">{error}</p>
-            )}
+            {error && <p className="text-sm text-red-400">{error}</p>}
             <div>
               <label className="block text-sm text-muted-foreground mb-1">Name</label>
               <Input

@@ -1,8 +1,9 @@
 import { getServerSession } from "next-auth";
 import { redirect, notFound } from "next/navigation";
 import { authOptions } from "@/lib/auth";
-import { requireTenant } from "@makemyownmodel/tenant-context";
+import { requireTenant, TenantNotFoundError } from "@makemyownmodel/tenant-context";
 import { tenantDb } from "@/lib/tenant-db";
+import { prisma } from "@/lib/prisma";
 import { TenantSidebar } from "@/components/tenant-sidebar";
 import Link from "next/link";
 import Image from "next/image";
@@ -22,7 +23,18 @@ export default async function TenantLayout({
   let org;
   try {
     org = await requireTenant(tenantDb, slug, session.user.id);
-  } catch {
+  } catch (err) {
+    if (err instanceof TenantNotFoundError) {
+      const memberships = await prisma.membership.findMany({
+        where: { userId: session.user.id },
+        include: { organization: true },
+        orderBy: { createdAt: "asc" },
+      });
+      const firstOrg = memberships[0]?.organization;
+      if (firstOrg) {
+        redirect(`/t/${firstOrg.slug}`);
+      }
+    }
     notFound();
   }
   return (

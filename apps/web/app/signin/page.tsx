@@ -1,7 +1,7 @@
 "use client";
 
 import { signIn } from "next-auth/react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -9,7 +9,6 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default function SignInPage() {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get("callbackUrl") ?? "/";
   const [email, setEmail] = useState("");
@@ -20,16 +19,14 @@ export default function SignInPage() {
     e.preventDefault();
     setError("");
     const res = await signIn("credentials", {
-      email,
+      email: email.trim().toLowerCase(),
       password,
-      redirect: false,
+      callbackUrl,
+      redirect: true,
     });
     if (res?.error) {
       setError("Invalid email or password");
-      return;
     }
-    router.push(callbackUrl);
-    router.refresh();
   }
 
   return (
@@ -40,9 +37,7 @@ export default function SignInPage() {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
-            {error && (
-              <p className="text-sm text-red-400">{error}</p>
-            )}
+            {error && <p className="text-sm text-red-400">{error}</p>}
             <div>
               <label className="block text-sm text-muted-foreground mb-1">Email</label>
               <Input

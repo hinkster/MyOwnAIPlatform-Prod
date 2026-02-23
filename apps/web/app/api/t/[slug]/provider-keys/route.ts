@@ -1,7 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import { requireTenant, assertNotDemoTenant, DemoTenantLockedError } from "@makemyownmodel/tenant-context";
+import {
+  requireTenant,
+  assertNotDemoTenant,
+  DemoTenantLockedError,
+} from "@makemyownmodel/tenant-context";
 import { tenantDb } from "@/lib/tenant-db";
 import { prisma } from "@/lib/prisma";
 import { encrypt } from "@makemyownmodel/encryption";
@@ -12,10 +16,7 @@ const bodySchema = z.object({
   key: z.string().min(1),
 });
 
-export async function POST(
-  req: NextRequest,
-  { params }: { params: { slug: string } }
-) {
+export async function POST(req: NextRequest, { params }: { params: { slug: string } }) {
   const session = await getServerSession(authOptions);
   const { slug } = params;
   if (!session?.user?.id) {

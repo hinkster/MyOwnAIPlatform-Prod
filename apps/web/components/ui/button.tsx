@@ -1,7 +1,6 @@
 import * as React from "react";
 
-export interface ButtonProps
-  extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: "default" | "outline" | "ghost";
 }
 
@@ -14,13 +13,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       outline: "border border-border text-muted-foreground hover:bg-white/5",
       ghost: "text-muted-foreground hover:bg-white/5",
     };
-    return (
-      <button
-        ref={ref}
-        className={`${base} ${variants[variant]} ${className}`}
-        {...props}
-      />
-    );
+    return <button ref={ref} className={`${base} ${variants[variant]} ${className}`} {...props} />;
   }
 );
 Button.displayName = "Button";

@@ -5,22 +5,33 @@ import { getTenantIdForRequest } from "@makemyownmodel/tenant-context";
 import { tenantDb } from "@/lib/tenant-db";
 import { z } from "zod";
 
-const bodySchema = z.object({
-  provider: z.enum(["OPENAI", "ANTHROPIC", "GEMINI"]),
-  key: z.string().min(1),
-});
+const TEST_TIMEOUT_MS = 15_000;
+
+function fetchWithTimeout(
+  url: string,
+  options: RequestInit & { timeout?: number } = {}
+): Promise<Response> {
+  const { timeout = TEST_TIMEOUT_MS, ...fetchOptions } = options;
+  const controller = new AbortController();
+  const id = setTimeout(() => controller.abort(), timeout);
+  return fetch(url, { ...fetchOptions, signal: controller.signal }).finally(() => clearTimeout(id));
+}
 
 async function testOpenAI(key: string): Promise<boolean> {
-  const res = await fetch("https://api.openai.com/v1/models", {
-    headers: { Authorization: `Bearer ${key}` },
-  });
-  return res.ok;
+  try {
+    const res = await fetchWithTimeout("https://api.openai.com/v1/models", {
+      headers: { Authorization: `Bearer ${key}` },
+      timeout: TEST_TIMEOUT_MS,
+    });
+    return res.ok;
+  } catch {
+    return false;
+  }
 }
 
 async function testAnthropic(key: string): Promise<boolean> {
-  const res = await fetch(
-    "https://api.anthropic.com/v1/messages",
-    {
+  try {
+    const res = await fetchWithTimeout("https://api.anthropic.com/v1/messages", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -32,29 +43,43 @@ async function testAnthropic(key: string): Promise<boolean> {
         max_tokens: 1,
         messages: [{ role: "user", content: "Hi" }],
       }),
-    }
-  );
-  return res.status !== 401 && res.status !== 403;
+      timeout: TEST_TIMEOUT_MS,
+    });
+    return res.status !== 401 && res.status !== 403;
+  } catch {
+    return false;
+  }
 }
 
 async function testGemini(key: string): Promise<boolean> {
-  const res = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models?key=${key}`
-  );
-  return res.ok;
+  try {
+    const res = await fetchWithTimeout(
+      `https://generativelanguage.googleapis.com/v1beta/models?key=${key}`,
+      { timeout: TEST_TIMEOUT_MS }
+    );
+    return res.ok;
+  } catch {
+    return false;
+  }
 }
 
-export async function POST(
-  req: NextRequest,
-  { params }: { params: { slug: string } }
-) {
+export async function POST(req: NextRequest, { params }: { params: { slug: string } }) {
   const session = await getServerSession(authOptions);
   const { slug } = params;
   if (!session?.user?.id) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
-  await getTenantIdForRequest(tenantDb, slug, session.user.id);
-  const parsed = bodySchema.safeParse(await req.json());
+  try {
+    await getTenantIdForRequest(tenantDb, slug, session.user.id);
+  } catch {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
+  let parsed;
+  try {
+    parsed = bodySchema.safeParse(await req.json());
+  } catch {
+    return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
+  }
   if (!parsed.success) {
     return NextResponse.json({ error: "Invalid input" }, { status: 400 });
   }

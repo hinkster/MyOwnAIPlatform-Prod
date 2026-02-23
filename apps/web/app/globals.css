@@ -27,10 +27,10 @@
     --ring: 43 96% 64%;
     --radius: 0.5rem;
     /* Raw brand hex for components that need them */
-    --brand-primary: #1A2A6C;
-    --brand-accent: #FBC549;
-    --brand-accent-alt: #EEAA33;
-    --brand-steel: #7D939F;
+    --brand-primary: #1a2a6c;
+    --brand-accent: #fbc549;
+    --brand-accent-alt: #eeaa33;
+    --brand-steel: #7d939f;
   }
 
   .dark {
@@ -39,9 +39,9 @@
     --card: 222 47% 11%;
     --primary: 224 58% 26%;
     --accent: 43 96% 64%;
-    --brand-primary: #1A2A6C;
-    --brand-accent: #FBC549;
-    --brand-steel: #7D939F;
+    --brand-primary: #1a2a6c;
+    --brand-accent: #fbc549;
+    --brand-steel: #7d939f;
   }
 }
 

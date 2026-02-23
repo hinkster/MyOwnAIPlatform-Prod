@@ -5,11 +5,7 @@ import { tenantDb } from "@/lib/tenant-db";
 import { prisma } from "@/lib/prisma";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
-export default async function DashboardPage({
-  params,
-}: {
-  params: { slug: string };
-}) {
+export default async function DashboardPage({ params }: { params: { slug: string } }) {
   const session = await getServerSession(authOptions);
   const { slug } = params;
   if (!session?.user?.id) return null;

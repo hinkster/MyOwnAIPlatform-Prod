@@ -14,15 +14,18 @@
    ```bash
    cp .env.example .env
    ```
+
    (Or `cp infra/.env.example .env`; both are consistent.)
 
 2. **Set required variables in `.env`**
-
-   - `APP_ENCRYPTION_KEY` — 32-byte key as 64-char hex, e.g. from:
-     ```bash
-     openssl rand -hex 32
+   - `APP_ENCRYPTION_KEY` — 32-byte key as 64-char hex. Generate with PowerShell (no Node/OpenSSL):
+     ```powershell
+     .\scripts\generate-encryption-key.ps1
      ```
-   - `NEXTAUTH_SECRET` — any long random string (e.g. `openssl rand -base64 32`)
+     If script execution is restricted, run this in PowerShell instead:
+     `$rng=[System.Security.Cryptography.RandomNumberGenerator]::Create();$b=New-Object byte[] 32;$rng.GetBytes($b);[System.BitConverter]::ToString($b)-replace '-',''`
+     Or with Node if available: `node scripts/generate-encryption-key.js`
+   - `NEXTAUTH_SECRET` — any long random string (e.g. run the same script twice, or use any 32+ character random string)
    - `NEXTAUTH_URL` — `http://localhost:3000` for local
 
    Leave `DATABASE_URL`, `REDIS_URL`, `QDRANT_URL` as in the example if you only run via Docker; the compose file overrides them for the web container.
@@ -44,10 +47,9 @@
    ```
 
 5. **Open**
-
-   - App: http://localhost:3000  
-   - Health: http://localhost:3000/api/health  
-   - Demo: http://localhost:3000/t/demo  
+   - App: http://localhost:3000
+   - Health: http://localhost:3000/api/health
+   - Demo: http://localhost:3000/t/demo
    - Sign up to create your org and go through onboarding.
 
 ## Optional: Ollama

@@ -10,8 +10,5 @@ export async function GET() {
     postgres = "error";
   }
   const status = postgres === "connected" ? "ok" : "degraded";
-  return NextResponse.json(
-    { status, postgres },
-    { status: 200 }
-  );
+  return NextResponse.json({ status, postgres }, { status: 200 });
 }

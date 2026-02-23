@@ -4,6 +4,7 @@ import { compare } from "bcryptjs";
 import { prisma } from "./prisma";
 
 export const authOptions: NextAuthOptions = {
+  trustHost: true,
   providers: [
     CredentialsProvider({
       name: "Credentials",
@@ -13,13 +14,19 @@ export const authOptions: NextAuthOptions = {
       },
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) return null;
-        const user = await prisma.user.findUnique({
-          where: { email: credentials.email },
-        });
-        if (!user?.passwordHash) return null;
-        const ok = await compare(credentials.password, user.passwordHash);
+        const emailLower = credentials.email.trim().toLowerCase();
+        const rows = await prisma.$queryRaw<
+          Array<{ id: string; email: string; password_hash: string; name: string | null }>
+        >`
+          SELECT id, email, password_hash, name FROM "User"
+          WHERE LOWER(TRIM(email)) = LOWER(TRIM(${emailLower}))
+          LIMIT 1
+        `;
+        const user = rows[0];
+        if (!user?.password_hash) return null;
+        const ok = await compare(credentials.password, user.password_hash);
         if (!ok) return null;
-        return { id: user.id, email: user.email!, name: user.name ?? undefined };
+        return { id: user.id, email: user.email, name: user.name ?? undefined };
       },
     }),
   ],

@@ -7,7 +7,6 @@
 2. **Env**
 
    Copy `infra/.env.example` to `.env` at repo root. Set:
-
    - `DATABASE_URL` — e.g. `postgresql://postgres:postgres@localhost:5432/makemyownmodel`
    - `REDIS_URL` — e.g. `redis://localhost:6379`
    - `QDRANT_URL` — e.g. `http://localhost:6333`

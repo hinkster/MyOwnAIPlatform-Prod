@@ -18,7 +18,7 @@ From a fresh clone:
 ```bash
 # From repo root
 cp .env.example .env
-# Edit .env: set APP_ENCRYPTION_KEY (openssl rand -hex 32), NEXTAUTH_SECRET, NEXTAUTH_URL
+# Edit .env: set APP_ENCRYPTION_KEY (run: .\scripts\generate-encryption-key.ps1), NEXTAUTH_SECRET, NEXTAUTH_URL
 
 docker compose -f infra/docker-compose.dev.yml up --build
 ```

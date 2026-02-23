@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
@@ -21,9 +23,7 @@ export default function LandingPage() {
             priority
           />
         </div>
-        <h1 className="text-4xl font-bold tracking-tight text-brand-steel">
-          MY OWN AI MODEL
-        </h1>
+        <h1 className="text-4xl font-bold tracking-tight text-brand-steel">MY OWN AI MODEL</h1>
         <p className="text-lg text-brand-steel/90">
           Build and personalize your AI. One platform, your data, your rules.
         </p>

@@ -7,11 +7,7 @@ import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
-export default async function TenantHomePage({
-  params,
-}: {
-  params: { slug: string };
-}) {
+export default async function TenantHomePage({ params }: { params: { slug: string } }) {
   const { slug } = params;
   const org = await getTenantFromSlug(tenantDb, slug);
   if (!org) return null;
@@ -21,7 +17,8 @@ export default async function TenantHomePage({
       <div className="p-8">
         <h1 className="text-2xl font-bold text-white mb-2">Demo tenant</h1>
         <p className="text-muted-foreground mb-6">
-          This is the locked demo organization. You can view the dashboard but cannot change provider keys.
+          This is the locked demo organization. You can view the dashboard but cannot change
+          provider keys.
         </p>
         <Card>
           <CardHeader>

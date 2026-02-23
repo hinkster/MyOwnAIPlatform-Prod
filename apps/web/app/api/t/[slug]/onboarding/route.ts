@@ -1,7 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import { getTenantIdForRequest } from "@makemyownmodel/tenant-context";
+import {
+  getTenantIdForRequest,
+  TenantForbiddenError,
+  TenantNotFoundError,
+} from "@makemyownmodel/tenant-context";
 import { tenantDb } from "@/lib/tenant-db";
 import { prisma } from "@/lib/prisma";
 import { encrypt } from "@makemyownmodel/encryption";
@@ -15,90 +19,101 @@ const bodySchema = z.object({
   tone: z.string().optional(),
   providerOrder: z.array(z.enum(["OPENAI", "ANTHROPIC", "GEMINI"])).optional(),
   allowOllamaFallback: z.boolean().optional(),
-  branding: z.object({ logoUrl: z.string().optional(), primaryColor: z.string().optional() }).optional(),
+  branding: z
+    .object({ logoUrl: z.string().optional(), primaryColor: z.string().optional() })
+    .optional(),
   providerKeys: z.record(z.enum(["OPENAI", "ANTHROPIC", "GEMINI"]), z.string()).optional(),
 });
 
-export async function POST(
-  req: NextRequest,
-  { params }: { params: { slug: string } }
-) {
-  const session = await getServerSession(authOptions);
-  const { slug } = params;
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-  const tenantId = await getTenantIdForRequest(tenantDb, slug, session.user.id);
-  const org = await prisma.organization.findUnique({ where: { id: tenantId } });
-  if (!org || org.slug === "demo") {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-  }
-  const parsed = bodySchema.safeParse(await req.json());
-  if (!parsed.success) {
-    return NextResponse.json({ error: "Invalid input" }, { status: 400 });
-  }
-  const data = parsed.data;
-
-  if (data.organizationName !== undefined) {
-    await prisma.organization.update({
-      where: { id: tenantId },
-      data: { name: data.organizationName },
-    });
-  }
-  if (data.slug !== undefined && data.slug !== org.slug) {
-    const existing = await prisma.organization.findUnique({ where: { slug: data.slug } });
-    if (existing) {
-      return NextResponse.json({ error: "Slug already taken" }, { status: 400 });
+export async function POST(req: NextRequest, { params }: { params: { slug: string } }) {
+  try {
+    const session = await getServerSession(authOptions);
+    const { slug } = params;
+    if (!session?.user?.id) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-    await prisma.organization.update({
-      where: { id: tenantId },
-      data: { slug: data.slug },
-    });
-  }
+    const tenantId = await getTenantIdForRequest(tenantDb, slug, session.user.id);
+    const org = await prisma.organization.findUnique({ where: { id: tenantId } });
+    if (!org || org.slug === "demo") {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+    const parsed = bodySchema.safeParse(await req.json());
+    if (!parsed.success) {
+      return NextResponse.json({ error: "Invalid input" }, { status: 400 });
+    }
+    const data = parsed.data;
 
-  let config = await prisma.tenantConfig.findUnique({
-    where: { organizationId: tenantId },
-  });
-  if (!config) {
-    config = await prisma.tenantConfig.create({
-      data: {
-        organizationId: tenantId,
-        providerOrder: ["OPENAI", "ANTHROPIC", "GEMINI"],
-        allowOllamaFallback: false,
-      },
-    });
-  }
+    if (data.organizationName !== undefined) {
+      await prisma.organization.update({
+        where: { id: tenantId },
+        data: { name: data.organizationName },
+      });
+    }
+    if (data.slug !== undefined && data.slug !== org.slug) {
+      const existing = await prisma.organization.findUnique({ where: { slug: data.slug } });
+      if (existing) {
+        return NextResponse.json({ error: "Slug already taken" }, { status: 400 });
+      }
+      await prisma.organization.update({
+        where: { id: tenantId },
+        data: { slug: data.slug },
+      });
+    }
 
-  const updates: Parameters<typeof prisma.tenantConfig.update>[0]["data"] = {};
-  if (data.useCase !== undefined) updates.useCase = data.useCase;
-  if (data.tone !== undefined) updates.tone = data.tone;
-  if (data.providerOrder !== undefined) updates.providerOrder = data.providerOrder;
-  if (data.allowOllamaFallback !== undefined) updates.allowOllamaFallback = data.allowOllamaFallback;
-  if (data.branding !== undefined) updates.branding = data.branding;
-  if (Object.keys(updates).length > 0) {
-    await prisma.tenantConfig.update({
+    let config = await prisma.tenantConfig.findUnique({
       where: { organizationId: tenantId },
-      data: updates,
     });
-  }
-
-  if (data.providerKeys) {
-    for (const [provider, key] of Object.entries(data.providerKeys)) {
-      if (!key) continue;
-      const encryptedKey = encrypt(key);
-      await prisma.providerKey.upsert({
-        where: {
-          organizationId_provider: { organizationId: tenantId, provider: provider as any },
-        },
-        update: { encryptedKey },
-        create: {
+    if (!config) {
+      config = await prisma.tenantConfig.create({
+        data: {
           organizationId: tenantId,
-          provider: provider as any,
-          encryptedKey,
+          providerOrder: ["OPENAI", "ANTHROPIC", "GEMINI"],
+          allowOllamaFallback: false,
         },
       });
     }
-  }
 
-  return NextResponse.json({ ok: true });
+    const updates: Parameters<typeof prisma.tenantConfig.update>[0]["data"] = {};
+    if (data.useCase !== undefined) updates.useCase = data.useCase;
+    if (data.tone !== undefined) updates.tone = data.tone;
+    if (data.providerOrder !== undefined) updates.providerOrder = data.providerOrder;
+    if (data.allowOllamaFallback !== undefined)
+      updates.allowOllamaFallback = data.allowOllamaFallback;
+    if (data.branding !== undefined) updates.branding = data.branding;
+    if (Object.keys(updates).length > 0) {
+      await prisma.tenantConfig.update({
+        where: { organizationId: tenantId },
+        data: updates,
+      });
+    }
+
+    if (data.providerKeys) {
+      for (const [provider, key] of Object.entries(data.providerKeys)) {
+        if (!key) continue;
+        const encryptedKey = encrypt(key);
+        await prisma.providerKey.upsert({
+          where: {
+            organizationId_provider: { organizationId: tenantId, provider: provider as any },
+          },
+          update: { encryptedKey },
+          create: {
+            organizationId: tenantId,
+            provider: provider as any,
+            encryptedKey,
+          },
+        });
+      }
+    }
+
+    return NextResponse.json({ ok: true });
+  } catch (err) {
+    if (err instanceof TenantForbiddenError) {
+      return NextResponse.json({ error: err.message }, { status: 403 });
+    }
+    if (err instanceof TenantNotFoundError) {
+      return NextResponse.json({ error: err.message }, { status: 404 });
+    }
+    const message = err instanceof Error ? err.message : "Server error";
+    return NextResponse.json({ error: message }, { status: 500 });
+  }
 }

@@ -1,5 +1,6 @@
-# Base image with pnpm
+# Base image with pnpm and OpenSSL (required by Prisma engine on Alpine)
 FROM node:20-alpine AS base
+RUN apk add --no-cache openssl
 RUN corepack enable && corepack prepare pnpm@9.0.0 --activate
 WORKDIR /app
 
