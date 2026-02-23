@@ -5,7 +5,12 @@ import { getTenantIdForRequest } from "@makemyownmodel/tenant-context";
 import { tenantDb } from "@/lib/tenant-db";
 import { z } from "zod";
 
-const TEST_TIMEOUT_MS = 15_000;
+const TEST_TIMEOUT_MS = 6_000;
+
+const bodySchema = z.object({
+  provider: z.enum(["OPENAI", "ANTHROPIC", "GEMINI"]),
+  key: z.string().min(1),
+});
 
 function fetchWithTimeout(
   url: string,
