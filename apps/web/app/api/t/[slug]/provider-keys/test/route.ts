@@ -68,10 +68,7 @@ async function testGemini(key: string): Promise<boolean> {
   }
 }
 
-export async function POST(
-  req: NextRequest,
-  { params }: { params: { slug: string } }
-) {
+export async function POST(req: NextRequest, { params }: { params: { slug: string } }) {
   const session = await getServerSession(authOptions);
   const { slug } = params;
   if (!session?.user?.id) {
