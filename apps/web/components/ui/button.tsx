@@ -21,12 +21,18 @@ export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className = "", variant = "default", size = "default", asChild, children, ...props }, ref) => {
-    const combinedClassName = `${base} ${sizeClasses[size]} ${variants[variant]} ${className}`.trim();
+    const combinedClassName =
+      `${base} ${sizeClasses[size]} ${variants[variant]} ${className}`.trim();
     if (asChild && React.isValidElement(children)) {
-      return React.cloneElement(children as React.ReactElement<{ className?: string; ref?: React.Ref<unknown> }>, {
-        className: [combinedClassName, (children.props as { className?: string }).className].filter(Boolean).join(" "),
-        ref,
-      });
+      return React.cloneElement(
+        children as React.ReactElement<{ className?: string; ref?: React.Ref<unknown> }>,
+        {
+          className: [combinedClassName, (children.props as { className?: string }).className]
+            .filter(Boolean)
+            .join(" "),
+          ref,
+        }
+      );
     }
     return (
       <button ref={ref} className={combinedClassName} {...props}>

@@ -19,9 +19,7 @@ function fetchWithTimeout(
   const { timeout = TEST_TIMEOUT_MS, ...fetchOptions } = options;
   const controller = new AbortController();
   const id = setTimeout(() => controller.abort(), timeout);
-  return fetch(url, { ...fetchOptions, signal: controller.signal }).finally(() =>
-    clearTimeout(id)
-  );
+  return fetch(url, { ...fetchOptions, signal: controller.signal }).finally(() => clearTimeout(id));
 }
 
 async function testOpenAI(key: string): Promise<boolean> {
