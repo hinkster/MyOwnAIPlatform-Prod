@@ -16,8 +16,8 @@ Phase 1: Docker-first, reproducible, tenant-safe foundation. Next.js App Router,
 From a fresh clone:
 
 ```bash
-# From repo root
-cp .env.example .env
+# From repo root. Compose uses env_file ../.env (repo root).
+cp infra/.env.example .env
 # Edit .env: set APP_ENCRYPTION_KEY (run: .\scripts\generate-encryption-key.ps1), NEXTAUTH_SECRET, NEXTAUTH_URL
 
 docker compose -f infra/docker-compose.dev.yml up --build
@@ -58,7 +58,7 @@ pnpm --filter web test
 
 ## Env vars
 
-See [infra/.env.example](infra/.env.example) or root [.env.example](.env.example). Required: `DATABASE_URL`, `APP_ENCRYPTION_KEY`, `NEXTAUTH_SECRET`, `NEXTAUTH_URL`, `REDIS_URL`, `QDRANT_URL`. Optional: `OLLAMA_BASE_URL` (with ollama profile).
+Compose reads `env_file: ../.env` (repo root). Copy [infra/.env.example](infra/.env.example) to `.env` at repo root. Required: `DATABASE_URL`, `APP_ENCRYPTION_KEY`, `NEXTAUTH_SECRET`, `NEXTAUTH_URL`, `REDIS_URL`, `QDRANT_URL`. Optional: `OLLAMA_BASE_URL` (with ollama profile), provider keys.
 
 ## Phase 2 (outline only)
 
