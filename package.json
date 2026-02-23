@@ -3,7 +3,7 @@
   "private": true,
   "scripts": {
     "dev": "pnpm --filter web dev",
-    "build": "pnpm --filter web build",
+    "build": "pnpm --filter @makemyownmodel/encryption build && pnpm --filter @makemyownmodel/tenant-context build && pnpm --filter web build",
     "test": "pnpm -r test",
     "lint": "pnpm run format:check && node scripts/run-next-lint.cjs",
     "format": "prettier --write .",

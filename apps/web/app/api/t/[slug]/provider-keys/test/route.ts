@@ -5,7 +5,7 @@ import { getTenantIdForRequest } from "@makemyownmodel/tenant-context";
 import { tenantDb } from "@/lib/tenant-db";
 import { z } from "zod";
 
-const TEST_TIMEOUT_MS = 6_000;
+const TEST_TIMEOUT_MS = 6_000; // 5–8s range
 
 const bodySchema = z.object({
   provider: z.enum(["OPENAI", "ANTHROPIC", "GEMINI"]),
@@ -19,7 +19,9 @@ function fetchWithTimeout(
   const { timeout = TEST_TIMEOUT_MS, ...fetchOptions } = options;
   const controller = new AbortController();
   const id = setTimeout(() => controller.abort(), timeout);
-  return fetch(url, { ...fetchOptions, signal: controller.signal }).finally(() => clearTimeout(id));
+  return fetch(url, { ...fetchOptions, signal: controller.signal }).finally(() =>
+    clearTimeout(id)
+  );
 }
 
 async function testOpenAI(key: string): Promise<boolean> {

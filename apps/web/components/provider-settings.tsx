@@ -88,9 +88,13 @@ export function ProviderSettings({
           </CardContent>
         </Card>
       )}
+
       {message && (
-        <p className={message.type === "ok" ? "text-green-400" : "text-red-400"}>{message.text}</p>
+        <p className={message.type === "ok" ? "text-green-400" : "text-red-400"}>
+          {message.text}
+        </p>
       )}
+
       {PROVIDERS.map((provider) => (
         <Card key={provider}>
           <CardHeader>

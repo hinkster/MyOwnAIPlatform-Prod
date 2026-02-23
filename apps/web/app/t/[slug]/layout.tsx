@@ -8,6 +8,8 @@ import { TenantSidebar } from "@/components/tenant-sidebar";
 import Link from "next/link";
 import Image from "next/image";
 
+export const dynamic = "force-dynamic";
+
 export default async function TenantLayout({
   children,
   params,

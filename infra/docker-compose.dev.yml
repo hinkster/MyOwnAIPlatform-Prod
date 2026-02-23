@@ -1,4 +1,5 @@
-# Phase 1 dev stack. From repo root:
+# Phase 1 dev stack — self-host / hybrid friendly
+# From repo root:
 #   docker compose -f infra/docker-compose.dev.yml up --build
 # Optional Ollama (not started by default):
 #   docker compose -f infra/docker-compose.dev.yml --profile ollama up
